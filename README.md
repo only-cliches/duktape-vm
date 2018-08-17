@@ -1,8 +1,8 @@
-#Duktape Javascript Virtual Machine
+# Duktape Javascript Virtual Machine
 
 [![NPM](https://nodei.co/npm/duktape-vm.png?downloads=true&stars=true)](https://nodei.co/npm/duktape-vm/)
 
-This project is a thin wrapper around the [DukTape Embedded Javascript Engine](https://duktape.org/) compiled to webassembly/asmjs.
+This project is a thin wrapper around the [Duktape Embedded Javascript Engine](https://duktape.org/) compiled to webassembly/asmjs.
 
 - Airtight sandbox for unsafe js code.
 - Runs in modern web browsers using Webassembly with asmjs fallback.
@@ -11,7 +11,7 @@ This project is a thin wrapper around the [DukTape Embedded Javascript Engine](h
 - VM supports ES5 and earlier javascript.
 - Only 140KB gzipped.
 
-##2 minute example
+## 2 minute example
 ```js
 
 const obj = {
@@ -75,7 +75,7 @@ To use directly in the browser, drop ONE of the tags below into your `<head>`.
 
 # MIT License
 
-Copyright (c) 2017 Scott Lott
+Copyright (c) 2018 Scott Lott
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
