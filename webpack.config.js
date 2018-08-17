@@ -9,7 +9,7 @@ module.exports = (env) => {
         },
         output: {
             path: path.join(__dirname, 'build'),
-            filename: env.target === "node" ? '[name].js' : (env.asm ? '[name].min.asm.js' : (env.both ? '[name].min.both.js' : '[name].min.asm.js')),
+            filename: env.target === "node" ? '[name].js' : (env.asm ? '[name].min.asm.js' : (env.both ? '[name].min.both.js' : '[name].min.js')),
             libraryTarget: 'umd',
             umdNamedDefine: true
         },
@@ -24,6 +24,9 @@ module.exports = (env) => {
         },
         watchOptions: {
             aggregateTimeout: 500,
+        },
+        node: {
+            global: false
         },
         optimization: {
             minimize: env.target === "node" ? false : true
@@ -42,7 +45,7 @@ module.exports = (env) => {
                             // emccPath: "path/to/emcc", // only needed if emcc is not in PATH,
                             memoryClass: false, // disable javascript memory management class,
                             // fetchFiles: true,
-                            asmJs: env.asm ? true : (env.both ? true : false),
+                            asmJs: env.asm || env.both ? true : false,
                             wasm: env.asm ? false : true,
                             fullEnv: true
                         }

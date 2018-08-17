@@ -9,6 +9,7 @@ This project is a thin wrapper around the [Duktape Embedded Javascript Engine](h
 - Runs on anything that supports NodeJS (no native code/compilation!).
 - Restricted code (cannot access node.js or window methods).
 - VM supports ES5 and earlier javascript.
+- Supports bidirectional messaging.
 - Only 140KB gzipped.
 
 ## 2 minute example
@@ -18,9 +19,9 @@ const obj = {
     key: "value";
 }
 
-DuktapeVM(`
-    // Provide variables and data to VM instance
-    // vm_breakout() allows you to run code in the parent window/global space.
+const vm = await DuktapeVM(`
+    // Provide data and methods to VM instance
+    // vm_breakout() allows you to eval code in the parent window/global space.
     // vm_breakout is only available here, it's not available in subsequent "vm.eval" calls.
 
     exports.console = function(message) {
@@ -29,17 +30,32 @@ DuktapeVM(`
     };
 
     exports.someObj = ${JSON.stringify(obj)};
+`);
 
-`).then((vm) => {
+vm.eval("2 + 2") // returns "4";
+vm.eval("exports.console('hello, world!')") // prints "hello, world!" to the browser console
+vm.eval("exports.someObj.key") // returns "value";
 
-    // instance is ready
-    vm.eval("2 + 2") // returns "4";
-    vm.eval("exports.console('hello, world!')") // prints "hello, world!" to the browser console
-    vm.eval("exports.someObj.key") // returns "value";
+vm.eval(`
+    exports.onMessage(function(msg) {
+        // got message from parent!
+    })
+    
+    // send message to parent
+    exports.message("some message to parent");
+`);
 
-    // destroy instance
-    vm.destroy();
+// send message to instance
+vm.message("this is a message to the vm");
+
+// listen for messages from vm
+vm.onMessage((msg) => {
+    console.log("Got message from vm: " + msg);
 })
+
+// destroy instance
+vm.destroy();
+
 ```
 
 ## Installation
@@ -64,13 +80,13 @@ To use directly in the browser, drop ONE of the tags below into your `<head>`.
 
 ```html
 <!-- Webassembly Only Version (Fast with 75% browser support), 140KB -->
-<script src="https://cdn.jsdelivr.net/npm/duktape-vm@0.0.1/build/duktape-vm.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/duktape-vm@0.0.2/build/duktape-vm.min.js"></script>
 
 <!-- AsmJS Only Version (Slower with 95% browser support), 150KB -->
-<script src="https://cdn.jsdelivr.net/npm/duktape-vm@0.0.1/build/duktape-vm.min.asm.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/duktape-vm@0.0.2/build/duktape-vm.min.asm.js"></script>
 
 <!-- Webassembly AND AsmJS Version (Fast with 95% browser support), 280KB -->
-<script src="https://cdn.jsdelivr.net/npm/duktape-vm@0.0.1/build/duktape-vm.min.both.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/duktape-vm@0.0.2/build/duktape-vm.min.both.js"></script>
 ```
 
 # MIT License

@@ -107,12 +107,26 @@ module.exports = __webpack_require__(1);
 
 Object.defineProperty(exports, "__esModule", { value: true });
 var wasm = __webpack_require__(2);
+var self = (typeof window !== "undefined" ? window : global);
+exports.uuid = function () {
+    var r, s, b = "";
+    return [b, b, b, b, b, b, b, b].reduce(function (prev, cur, i) {
+        r = Math.round(Math.random() * Math.pow(2, 16));
+        s = (i === 3 ? 4 : (i === 4 ? (r % 16 & 0x3 | 0x8).toString(16) : b));
+        r = r.toString(16);
+        while (r.length < 4)
+            r = "0" + r;
+        return prev + ([2, 3, 4, 5].indexOf(i) > -1 ? "-" : b) + (s + r).slice(0, 4);
+    }, b);
+};
 exports.DuktapeVM = function (init) {
-    if (init === void 0) { init = ""; }
+    var id = exports.uuid();
+    self.duktape[id] = [];
     return new Promise(function (res, rej) {
         wasm.init().then(function (mod) {
             var expo = {
                 destroy: function () {
+                    delete self.duktape[id];
                     mod.emModule.cwrap('dukweb_close', 'void', [])();
                 },
                 eval: function (code, safe) {
@@ -121,18 +135,23 @@ exports.DuktapeVM = function (init) {
                         throw new Error("VM Security violation, unable to execute code!");
                     }
                     return mod.emModule.cwrap('dukweb_eval', 'string', ['string'])(code);
+                },
+                onMessage: function (callback) {
+                    self.duktape[id].push(callback);
+                },
+                message: function (msg) {
+                    expo.eval("_messageCBs.forEach(function(cb) { cb(" + msg + ") })");
                 }
             };
             mod.emModule.cwrap('dukweb_open', 'void', [])();
-            expo.eval("\n            var exports = {}, \n                vm_breakout = this.emscripten_run_script,\n                vm_args = function(args) {\n                    return JSON.stringify(Array.prototype.join.call(args, \", \"))\n                };\n            ", false);
-            if (init)
-                expo.eval(init, false);
+            expo.eval("\n            var _messageCBs = [];\n            var exports = {}, \n                vm_breakout = this.emscripten_run_script,\n                vm_args = function(args) {\n                    return JSON.stringify(Array.prototype.join.call(args, \", \"))\n                };\n            \n            exports.message = function(message) {\n                vm_breakout(\"duktape['" + id + "'].forEach(function(fn) { fn(\" + message + \") })\");\n            }\n            exports.onMessage = function(cb) {\n                _messageCBs.push(cb);\n            }\n            " + (init || "") + "\n            ", false);
             res(expo);
         });
     });
 };
-if (typeof window !== "undefined") {
-    window.DuktapeVM = exports.DuktapeVM;
+if (!self.duktape) {
+    self.duktape = {};
+    self.DuktapeVM = exports.DuktapeVM;
 }
 
 
