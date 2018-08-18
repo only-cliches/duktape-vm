@@ -4,7 +4,7 @@ const self: any = (typeof window !== "undefined" ? window : global);
 
 export interface DuktapeExport {
     destroy: () => void;
-    eval: (js: string, safe?: boolean) => string;
+    eval: (js: string) => string;
     onMessage: (callback: (msg: string) => void) => void;
     message: (msg: string) => void;
 }
@@ -32,39 +32,47 @@ export const DuktapeVM = function(init: string):Promise<DuktapeExport> {
             const expo: DuktapeExport = {
                 destroy: () => {
                     delete self.duktape[id];
+
                     mod.emModule.cwrap('dukweb_close', 'void', [ ])();
                 },
-                eval: (code: string, safe: boolean = true): string => {
-                    if (safe && (code.indexOf("emscripten_run_script") !== -1 || code.indexOf("vm_breakout") !== -1)) {
-                        throw new Error("VM Security violation, unable to execute code!");
-                    }
-                    return (mod.emModule.cwrap('dukweb_eval', 'string', [ 'string' ]) as any)(code);
+                eval: (code: string): string => {
+                    return mod.emModule.cwrap('dukweb_eval', 'string', [ 'string' ])(code);
                 },
                 onMessage: (callback: (msg: string) => void) => {
                     self.duktape[id].push(callback);
                 },
                 message: (msg: string) => {
-                    expo.eval(`_messageCBs.forEach(function(cb) { cb(${msg}) })`)
+                    expo.eval(`_messageCBs.forEach(function(cb) { cb("${msg}") })`)
                 }
             }
             
             mod.emModule.cwrap('dukweb_open', 'void', [])();
             expo.eval(`
             var _messageCBs = [];
-            var exports = {}, 
-                vm_breakout = this.emscripten_run_script,
-                vm_args = function(args) {
-                    return JSON.stringify(Array.prototype.join.call(args, ", "))
-                };
-            
-            exports.message = function(message) {
-                vm_breakout("duktape['${id}'].forEach(function(fn) { fn(" + message + ") })");
-            }
-            exports.onMessage = function(cb) {
-                _messageCBs.push(cb);
-            }
-            ${init || ""}
-            `, false);
+            var exports = {};
+            var vm_args = function(args) {
+                return JSON.stringify(Array.prototype.join.call(args, ", "))
+            };
+
+            (function(vm_breakout) {
+
+                exports.message = function(message) {
+                    vm_breakout("duktape['${id}'].forEach(function(fn) { fn('" + message + "') })");
+                }
+                exports.onMessage = function(cb) {
+                    _messageCBs.push(cb);
+                }
+
+                try {
+                    ${init || ""}
+                } catch(e) {
+                    vm_breakout("console.error('Syntax error in VM init code!')");
+                }
+                
+            })(this.emscripten_run_script);
+
+            delete this.emscripten_run_script;
+            `);
             res(expo);
         });
     });

@@ -1,12 +1,12 @@
 /*
- *  Duktape public API for Duktape 2.3.0.
+ *  Duktape public API for Duktape 2.3.99.
  *
  *  See the API reference for documentation on call semantics.  The exposed,
  *  supported API is between the "BEGIN PUBLIC API" and "END PUBLIC API"
  *  comments.  Other parts of the header are Duktape internal and related to
  *  e.g. platform/compiler/feature detection.
  *
- *  Git commit d7fdb67f18561a50e06bafd196c6b423af9ad6fe (v2.3.0).
+ *  Git commit d04450083f795bcc58008f98b19bb2b5727f2711 (v2.3.0-7-gd0445008-dirty).
  *  Git branch master.
  *
  *  See Duktape AUTHORS.rst and LICENSE.txt for copyright and
@@ -164,15 +164,15 @@
  * development snapshots have 99 for patch level (e.g. 0.10.99 would be a
  * development version after 0.10.0 but before the next official release).
  */
-#define DUK_VERSION                       20300L
+#define DUK_VERSION                       20399L
 
 /* Git commit, describe, and branch for Duktape build.  Useful for
  * non-official snapshot builds so that application code can easily log
  * which Duktape snapshot was used.  Not available in the ECMAScript
  * environment.
  */
-#define DUK_GIT_COMMIT                    "d7fdb67f18561a50e06bafd196c6b423af9ad6fe"
-#define DUK_GIT_DESCRIBE                  "v2.3.0"
+#define DUK_GIT_COMMIT                    "d04450083f795bcc58008f98b19bb2b5727f2711"
+#define DUK_GIT_DESCRIBE                  "v2.3.0-7-gd0445008-dirty"
 #define DUK_GIT_BRANCH                    "master"
 
 /* External duk_config.h provides platform/compiler/OS dependent

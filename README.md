@@ -10,7 +10,7 @@ This project is a thin wrapper around the [Duktape Embedded Javascript Engine](h
 - Restricted code (cannot access node.js or window methods).
 - VM supports ES5 and earlier javascript.
 - Supports bidirectional messaging.
-- Only 140KB gzipped.
+- Only 110KB gzipped.
 
 ## 2 minute example
 ```js
@@ -26,16 +26,19 @@ const vm = await DuktapeVM(`
 
     exports.console = function(message) {
         // print to parent console
-        vm_breakout("console.log(" + message + ");")
+        vm_breakout("console.log('" + message + "');")
     };
 
     exports.someObj = ${JSON.stringify(obj)};
+    
+    // you can also inline js libraries here
 `);
 
 vm.eval("2 + 2") // returns "4";
 vm.eval("exports.console('hello, world!')") // prints "hello, world!" to the browser console
 vm.eval("exports.someObj.key") // returns "value";
 
+// Messaging API
 vm.eval(`
     exports.onMessage(function(msg) {
         // got message from parent!
@@ -79,14 +82,14 @@ const DuktapeVM = require("duktape-vm").DuktapeVM;
 To use directly in the browser, drop ONE of the tags below into your `<head>`.
 
 ```html
-<!-- Webassembly Only Version (Fast with 75% browser support), 140KB -->
-<script src="https://cdn.jsdelivr.net/npm/duktape-vm@0.0.2/build/duktape-vm.min.js"></script>
+<!-- Webassembly Only Version (Fast with 75% browser support), 110KB -->
+<script src="https://cdn.jsdelivr.net/npm/duktape-vm@0.0.3/build/duktape-vm.min.js"></script>
 
-<!-- AsmJS Only Version (Slower with 95% browser support), 150KB -->
-<script src="https://cdn.jsdelivr.net/npm/duktape-vm@0.0.2/build/duktape-vm.min.asm.js"></script>
+<!-- AsmJS Only Version (Slower with 95% browser support), 115KB -->
+<script src="https://cdn.jsdelivr.net/npm/duktape-vm@0.0.3/build/duktape-vm.min.asm.js"></script>
 
-<!-- Webassembly AND AsmJS Version (Fast with 95% browser support), 280KB -->
-<script src="https://cdn.jsdelivr.net/npm/duktape-vm@0.0.2/build/duktape-vm.min.both.js"></script>
+<!-- Webassembly AND AsmJS Version (Fast with 95% browser support), 220KB -->
+<script src="https://cdn.jsdelivr.net/npm/duktape-vm@0.0.3/build/duktape-vm.min.both.js"></script>
 ```
 
 # MIT License

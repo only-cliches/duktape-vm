@@ -1,6 +1,6 @@
 export interface DuktapeExport {
     destroy: () => void;
-    eval: (js: string, safe?: boolean) => string;
+    eval: (js: string) => string;
     onMessage: (callback: (msg: string) => void) => void;
     message: (msg: string) => void;
 }
