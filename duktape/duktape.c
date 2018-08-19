@@ -74605,12 +74605,12 @@ DUK_LOCAL DUK__NOINLINE_PERF DUK_COLD duk_small_uint_t duk__executor_interrupt(d
 
 	DUK_UNREF(fun);
 
-#if defined(DUK_USE_EXEC_TIMEOUT_CHECK)
+
 	/*
 	 *  Execution timeout check
 	 */
 
-	if (DUK_USE_EXEC_TIMEOUT_CHECK(thr->heap->heap_udata)) {
+	if (DUK_EXEC_INTERRUPT(thr->heap->heap_udata)) {
 		/* Keep throwing an error whenever we get here.  The unusual values
 		 * are set this way because no instruction is ever executed, we just
 		 * throw an error until all try/catch/finally and other catchpoints
@@ -74626,7 +74626,6 @@ DUK_LOCAL DUK__NOINLINE_PERF DUK_COLD duk_small_uint_t duk__executor_interrupt(d
 		DUK_ERROR_RANGE(thr, "execution timeout");
 		DUK_WO_NORETURN(return 0;);
 	}
-#endif  /* DUK_USE_EXEC_TIMEOUT_CHECK */
 
 #if defined(DUK_USE_DEBUGGER_SUPPORT)
 	if (!thr->heap->dbg_processing &&

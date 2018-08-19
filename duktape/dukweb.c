@@ -4,11 +4,44 @@
  *  https://github.com/kripken/emscripten/wiki/Interacting-with-code
  */
 
+#include <time.h>
 #include <stdio.h>
 #include <string.h>
 #include <emscripten.h>
-#include "duktape.c"
 
+#define DUK_USE_INTERRUPT_COUNTER true
+#define DUK_EXEC_INTERRUPT lowmem_exec_timeout_check
+#define  AJSHEAP_EXEC_TIMEOUT  9  /* seconds */
+
+
+static time_t curr_pcall_start = 0;
+static long exec_timeout_check_counter = 0;
+
+void lowmem_start_exec_timeout(void) {
+	curr_pcall_start = time(NULL);
+}
+
+void lowmem_clear_exec_timeout(void) {
+	curr_pcall_start = 0;
+}
+
+int lowmem_exec_timeout_check(void *udata) {
+	time_t now = time(NULL);
+	time_t diff = now - curr_pcall_start;
+
+	exec_timeout_check_counter++;
+
+	if (curr_pcall_start == 0) {
+		/* protected call not yet running */
+		return 0;
+	}
+	if (diff > AJSHEAP_EXEC_TIMEOUT) {
+		return 1;
+	}
+	return 0;
+}
+
+#include "duktape.c"
 static duk_context *dukweb_ctx = NULL;
 char duk__evalbuf[10 * 1024 * 1024]; // 10 MB eval heap
 
@@ -93,7 +126,6 @@ extern "C" {
 		/* add a binding to emscripten_run_script(), let init code move it
 		* to a better place
 		*/
-
 		duk_push_global_object(dukweb_ctx);
 		duk_push_string(dukweb_ctx, "emscripten_run_script");
 		duk_push_c_function(dukweb_ctx, dukweb__emscripten_run_script, 1 /*nargs*/);
@@ -132,6 +164,8 @@ extern "C" {
 			return (const char *) duk__evalbuf;
 		}
 
+		lowmem_start_exec_timeout();
+
 		// printf("dukweb_eval: '%s'\n", code);
 		duk_push_string(ctx, code);
 		if (duk_peval(ctx) != 0) {
@@ -146,7 +180,6 @@ extern "C" {
 
 		if (res) {
 			size_t len = strlen(res);
-
 			if (len > sizeof(duk__evalbuf) - 1) {
 				sprintf(duk__evalbuf, "\"eval result too long\"");
 			} else {
@@ -155,6 +188,8 @@ extern "C" {
 		} else {
 			sprintf(duk__evalbuf, "\"eval result null\"");
 		}
+
+		lowmem_clear_exec_timeout();
 
 		duk_set_top(ctx, 0);
 	#if 0

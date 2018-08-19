@@ -10,10 +10,10 @@ module.exports = (env) => {
         output: {
             path: path.join(__dirname, 'build'),
             filename: env.target === "node" ? '[name].js' : (env.asm ? '[name].min.asm.js' : (env.both ? '[name].min.both.js' : '[name].min.js')),
-            libraryTarget: 'umd',
+            libraryTarget: env.target === "node" ? 'commonjs2' : 'umd',
             umdNamedDefine: true
         },
-        target: env.target || "web",
+        // target: env.target || "web",
         resolve: {
             extensions: ['.ts', '.js', ".c", ".cpp"]
         },
