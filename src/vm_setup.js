@@ -1,87 +1,93 @@
-var _messageCBs = [], exports = {}, vm_args = function(args) {
-    return JSON.stringify(Array.prototype.join.call(args, ", "))
-};
+var _messageCBs = [],
+    _timers = {},
+    exports = {},
+    self = this || {}, 
+    setTimeout, 
+    setInterval, 
+    clearTimeout, 
+    clearInterval;
 
-var self = this || {};
+(function (vm_breakout) {
 
-var setTimeout, setInterval, clearTimeout, clearInterval, _timers = {};
+    Duktape.modSearch = function (id, require, exports, module) {
 
-(function(vm_breakout) {
+    };
 
-    setTimeout = function(cb, time) {
+    setTimeout = function (cb, time) {
         var timerID = Math.round(Math.random() * 100000);
         _timers[timerID] = cb;
         vm_breakout("duktape['${id}'].timeout(" + timerID + ", " + time + ")");
         return timerID;
-    }
+    };
 
-    setInterval = function(cb, time) {
+    setInterval = function (cb, time) {
         var timerID = Math.round(Math.random() * 100000);
         _timers[timerID] = cb;
         vm_breakout("duktape['${id}'].interval(" + timerID + ", " + time + ")");
         return timerID;
-    }
+    };
 
-    clearTimeout = function(timer) {
+    clearTimeout = function (timer) {
         vm_breakout("clearTimeout(duktape['${id}'].timers[" + timer + "])");
         delete _timers[timer];
-    }
+    };
 
-    clearInterval = function(timer) {
+    clearInterval = function (timer) {
         vm_breakout("clearInterval(duktape['${id}'].timers[" + timer + "])");
         delete _timers[timer];
-    }
+    };
 
-    exports._complete = function(id) {
-        return function(value) {
+    exports._complete = function (id) {
+        return function (value) {
             var val = typeof value === "string" ? "'" + value + "'" : value;
             vm_breakout("duktape['${id}'].successCBs['" + id + "'](" + val + ")");
         }
-    }
-    
-    exports._error = function(id) {
-        return function(value) {
+    };
+
+    exports._error = function (id) {
+        return function (value) {
             var val = typeof value === "string" ? "'" + value + "'" : value;
             vm_breakout("duktape['${id}'].errorCBs['" + id + "'](" + val + ")");
         }
-    }
+    };
 
-    exports.message = function(message) {
+    exports.message = function (message) {
         vm_breakout("duktape['${id}'].mCBs.forEach(function(fn) { fn('" + message + "') })");
-    }
+    };
 
-    exports.onMessage = function(cb) {
+    exports.onMessage = function (cb) {
         _messageCBs.push(cb);
-    }
+    };
 
     try {
-        (function() {
+        (function () {
             '${init}'
         })();
-    } catch(e) {
+    } catch (e) {
         vm_breakout("console.error('Syntax error in VM init code!')");
     }
 
-    
+
 })(this.emscripten_run_script);
 
 delete this.emscripten_run_script;
 
 // Promise polyfill
-var Promise = (function() {
+var Promise = (function () {
 
     var fastApply = function (args) {
-        return args[0].apply(null, Array.prototype.slice.call(args, 1));
-    }, setFast = function () {
-        var args = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-            args[_i] = arguments[_i];
-        }
-        setTimeout(function () {
-            fastApply(args);
-        }, 0);
-    };
-    var _INTERNAL = function () { };
+            return args[0].apply(null, Array.prototype.slice.call(args, 1));
+        },
+        setFast = function () {
+            var args = [];
+            for (var _i = 0; _i < arguments.length; _i++) {
+                args[_i] = arguments[_i];
+            }
+            setTimeout(function () {
+                fastApply(args);
+            }, 0);
+        };
+    var _INTERNAL = function () {};
     var _REJECTED = ['R'];
     var _FULFILLED = ['F'];
     var _PENDING = ['P'];
@@ -95,7 +101,7 @@ var Promise = (function() {
             }
         }
         Promise.prototype.catch = function (onRejected) {
-            return this.then(function () { }, onRejected);
+            return this.then(function () {}, onRejected);
         };
         Promise.prototype.then = function (onFulfilled, onRejected) {
             if (typeof onFulfilled !== 'function' && this._state === _FULFILLED ||
@@ -106,8 +112,7 @@ var Promise = (function() {
             if (this._state !== _PENDING) {
                 var resolver = this._state === _FULFILLED ? onFulfilled : onRejected;
                 _unwrap(promise, resolver, this._outcome);
-            }
-            else {
+            } else {
                 this._queue.push(new _QueueItem(promise, onFulfilled, onRejected));
             }
             return promise;
@@ -147,8 +152,7 @@ var Promise = (function() {
                 var maybeReturn = function (index, success, failure) {
                     if (failure !== undefined) {
                         results.push(failure);
-                    }
-                    else {
+                    } else {
                         results.push(success);
                     }
                     if (results.length == iterable.length) {
@@ -176,6 +180,7 @@ var Promise = (function() {
             if (Array.isArray(iterable) !== false) {
                 return this.reject(new TypeError());
             }
+
             function resolver(value) {
                 self.resolve(value).then(function (response) {
                     if (!called) {
@@ -220,20 +225,16 @@ var Promise = (function() {
         }
         _QueueItem.prototype._callFulfilled = function (value) {
             _handlers._resolve(this._promise, value);
-        };
-        ;
+        };;
         _QueueItem.prototype._otherCallFulfilled = function (value) {
             _unwrap(this._promise, this._onFulfilled, value);
-        };
-        ;
+        };;
         _QueueItem.prototype._callRejected = function (value) {
             _handlers._reject(this._promise, value);
-        };
-        ;
+        };;
         _QueueItem.prototype._otherCallRejected = function (value) {
             _unwrap(this._promise, this._onRejected, value);
-        };
-        ;
+        };;
         return _QueueItem;
     }());
     exports._QueueItem = _QueueItem;
@@ -249,14 +250,12 @@ var Promise = (function() {
             var returnValue;
             try {
                 returnValue = func.apply(null, value);
-            }
-            catch (e) {
+            } catch (e) {
                 return _handlers._reject(promise, e);
             }
             if (returnValue === promise) {
                 _handlers._reject(promise, new TypeError());
-            }
-            else {
+            } else {
                 _handlers._resolve(promise, returnValue);
             }
             return null;
@@ -268,8 +267,7 @@ var Promise = (function() {
      * @class _handlers
      */
     var _handlers = /** @class */ (function () {
-        function _handlers() {
-        }
+        function _handlers() {}
         _handlers._resolve = function (self, value) {
             var result = _tryCatch(_getThen, value);
             var thenable = result._value;
@@ -280,8 +278,7 @@ var Promise = (function() {
             }
             if (thenable) {
                 _safelyResolveThenable(self, thenable);
-            }
-            else {
+            } else {
                 self._state = _FULFILLED;
                 self._outcome = value;
                 while (++i < len) {
@@ -289,8 +286,7 @@ var Promise = (function() {
                 }
             }
             return self;
-        };
-        ;
+        };;
         _handlers._reject = function (self, error) {
             self._state = _REJECTED;
             self._outcome = error;
@@ -300,8 +296,7 @@ var Promise = (function() {
                 self._queue[i]._callRejected(error);
             }
             return self;
-        };
-        ;
+        };;
         return _handlers;
     }());
     /**
@@ -317,8 +312,7 @@ var Promise = (function() {
             return function appyThen() {
                 then.apply(obj, arguments);
             };
-        }
-        else {
+        } else {
             return null;
         }
     }
@@ -331,6 +325,7 @@ var Promise = (function() {
     function _safelyResolveThenable(self, thenable) {
         // Either fulfill, reject or reject with error
         var called = false;
+
         function onError() {
             var value = [];
             for (var _i = 0; _i < arguments.length; _i++) {
@@ -342,6 +337,7 @@ var Promise = (function() {
             called = true;
             _handlers._reject(self, value);
         }
+
         function onSuccess() {
             var value = [];
             for (var _i = 0; _i < arguments.length; _i++) {
@@ -353,6 +349,7 @@ var Promise = (function() {
             called = true;
             _handlers._resolve(self, value);
         }
+
         function tryToUnwrap() {
             thenable(onSuccess, onError);
         }
@@ -369,12 +366,14 @@ var Promise = (function() {
      * @returns
      */
     function _tryCatch(func, values) {
-        var out = { _status: null, _value: null };
+        var out = {
+            _status: null,
+            _value: null
+        };
         try {
             out._value = func(values);
             out._status = 'success';
-        }
-        catch (e) {
+        } catch (e) {
             out._status = 'error';
             out._value = e;
         }

@@ -2,13 +2,13 @@
 
 # Avoid summary of object/key for rejected property operations.  May be
 # relevant if keys contain potentially sensitive information.
-DUK_USE_PARANOID_ERRORS: true
+# DUK_USE_PARANOID_ERRORS: true
 
 # Disable tracebacks, minimizes attacker knowledge of call chains.  Access
 # to the internal error _Tracedata property provides access to all functions
 # in the call chain (even when they're otherwise not visible to sandboxed
 # code).
-DUK_USE_TRACEBACKS: false
+# DUK_USE_TRACEBACKS: false
 
 # Dense string hashing may be useful against accidental string hash collisions.
 # This won't prevent an attacker from finding intentional collisions.
@@ -73,6 +73,3 @@ DUK_USE_HTML_COMMENTS: false
 DUK_USE_SHEBANG_COMMENTS: false
 DUK_USE_REFLECT_BUILTIN: false
 DUK_USE_SYMBOL_BUILTIN: false
-
-DUK_USE_INTERRUPT_COUNTER: true
-DUK_USE_EXEC_TIMEOUT_CHECK: true

@@ -62,13 +62,13 @@ The library will attach `DuktapeVM` to window/global, allowing you to access it 
 
 ```html
 <!-- Webassembly Only Version (Fast with 75% browser support), 110KB -->
-<script src="https://cdn.jsdelivr.net/npm/duktape-vm@0.1.0/build/duktape-vm.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/duktape-vm@0.1.1/build/duktape-vm.min.js"></script>
 
 <!-- AsmJS Only Version (Slower with 95% browser support), 115KB -->
-<script src="https://cdn.jsdelivr.net/npm/duktape-vm@0.1.0/build/duktape-vm.min.asm.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/duktape-vm@0.1.1/build/duktape-vm.min.asm.js"></script>
 
 <!-- Webassembly AND AsmJS Version (Fast with 95% browser support), 220KB -->
-<script src="https://cdn.jsdelivr.net/npm/duktape-vm@0.1.0/build/duktape-vm.min.both.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/duktape-vm@0.1.1/build/duktape-vm.min.both.js"></script>
 ```
 
 ## Virtual Machine Available Globals
