@@ -20,7 +20,7 @@ DuktapeVM().then((vm) => {
     vm.eval("var testObj = {foo: 'bar'};");
     vm.eval("testObj.foo") // returns "bar";
 
-    vm.asyncEval(` 
+    vm.evalAsync(` 
         setTimeout(function() {
             _success("hello, " + args[0]);
         }, 1000);`, 
@@ -58,13 +58,13 @@ The library will attach `DuktapeVM` to window/global, allowing you to access it 
 
 ```html
 <!-- Webassembly Only Version (Fast with 75% browser support), 110KB -->
-<script src="https://cdn.jsdelivr.net/npm/duktape-vm@0.1.2/build/duktape-vm.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/duktape-vm@0.1.3/build/duktape-vm.min.js"></script>
 
 <!-- AsmJS Only Version (Slower with 95% browser support), 115KB -->
-<script src="https://cdn.jsdelivr.net/npm/duktape-vm@0.1.2/build/duktape-vm.min.asm.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/duktape-vm@0.1.3/build/duktape-vm.min.asm.js"></script>
 
 <!-- Webassembly with AsmJS fallback (Fast with 95% browser support), 220KB -->
-<script src="https://cdn.jsdelivr.net/npm/duktape-vm@0.1.2/build/duktape-vm.min.both.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/duktape-vm@0.1.3/build/duktape-vm.min.both.js"></script>
 ```
 
 ## Virtual Machine Available Globals
@@ -118,7 +118,7 @@ DuktapeVM(`
 
     // Async eval
     // use _success and _error as callbacks 
-    vm.asyncEval(`
+    vm.evalAsync(`
         setTimeout(function() {
 
             _success("done!");
@@ -131,7 +131,7 @@ DuktapeVM(`
 
     // Async Eval with arguments
     // arguments are passed in as "args" array
-    vm.asyncEval(`
+    vm.evalAsync(`
         setTimeout(function() {
 
             _success(args[0]);
