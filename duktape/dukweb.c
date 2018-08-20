@@ -11,7 +11,7 @@
 
 #define DUK_USE_INTERRUPT_COUNTER true
 #define DUK_EXEC_INTERRUPT lowmem_exec_timeout_check
-#define  AJSHEAP_EXEC_TIMEOUT  9  /* seconds */
+#define AJSHEAP_EXEC_TIMEOUT  9  /* seconds */
 
 
 static time_t curr_pcall_start = 0;
@@ -42,7 +42,7 @@ int lowmem_exec_timeout_check(void *udata) {
 }
 
 #include "duktape.c"
-#include "duk_module_duktape.c"
+// #include "duk_module_duktape.c"
 static duk_context *dukweb_ctx = NULL;
 char duk__evalbuf[10 * 1024 * 1024]; // 10 MB eval heap
 
@@ -123,7 +123,7 @@ extern "C" {
 		}
 		// printf("dukweb_open: creating heap\n");
 		dukweb_ctx = duk_create_heap(NULL, NULL, NULL, NULL, dukweb_fatal_handler);
-		duk_module_duktape_init(dukweb_ctx);
+		// duk_module_duktape_init(dukweb_ctx);
 
 		/* add a binding to emscripten_run_script(), let init code move it
 		* to a better place

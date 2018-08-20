@@ -1,7 +1,7 @@
 export interface DuktapeExport {
     destroy: () => void;
-    eval: (js: string) => string;
-    evalAsync: (js: string) => Promise<string>;
+    eval: (js: string, args?: any[]) => string;
+    evalAsync: (js: string, args?: any[]) => Promise<string>;
     onMessage: (callback: (msg: string) => void) => void;
     message: (msg: string) => void;
 }

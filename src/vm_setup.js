@@ -39,20 +39,20 @@ var _messageCBs = [],
 
     exports._complete = function (id) {
         return function (value) {
-            var val = typeof value === "string" ? "'" + value + "'" : value;
+            var val = typeof value === "string" ? "'" + value.replace(/\'/gmi, "\\'") + "'" : value;
             vm_breakout("duktape['${id}'].successCBs['" + id + "'](" + val + ")");
         }
     };
 
     exports._error = function (id) {
         return function (value) {
-            var val = typeof value === "string" ? "'" + value + "'" : value;
+            var val = typeof value === "string" ? "'" + value.replace(/\'/gmi, "\\'") + "'" : value;
             vm_breakout("duktape['${id}'].errorCBs['" + id + "'](" + val + ")");
         }
     };
 
     exports.message = function (message) {
-        vm_breakout("duktape['${id}'].mCBs.forEach(function(fn) { fn('" + message + "') })");
+        vm_breakout("duktape['${id}'].mCBs.forEach(function(fn) { fn('" + message.replace(/\'/gmi, "\\'") + "') })");
     };
 
     exports.onMessage = function (cb) {
@@ -61,7 +61,7 @@ var _messageCBs = [],
 
     try {
         (function () {
-            '${init}'
+            "${init}"
         })();
     } catch (e) {
         vm_breakout("console.error('Syntax error in VM init code!')");
