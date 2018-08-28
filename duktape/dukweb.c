@@ -138,7 +138,7 @@ extern "C" {
 	EMSCRIPTEN_KEEPALIVE
 	void dukweb_close(void) {
 		if (dukweb_ctx) {
-			printf("dukweb_close: destroying heap\n");
+			// printf("dukweb_close: destroying heap\n");
 			duk_destroy_heap(dukweb_ctx);
 			dukweb_ctx = NULL;
 		} else {

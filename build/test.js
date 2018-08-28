@@ -6,4 +6,6 @@ DuktapeVM(`
     }
 `).then((vm) => {
     console.log(vm.eval("return args[0] + args[1]", [2, 3]));
+    vm.reset();
+    console.log(vm.eval("return args[0] + args[1]", [2, 3]));
 });

@@ -2,7 +2,7 @@
 
 [![NPM](https://nodei.co/npm/duktape-vm.png?downloads=true&stars=true)](https://nodei.co/npm/duktape-vm/)
 
-This project is a thin wrapper around the [Duktape Embedded Javascript Engine](https://duktape.org/) compiled to webassembly/asmjs.
+This project is a wrapper around the [Duktape Embedded Javascript Engine](https://duktape.org/) compiled to webassembly/asmjs.
 
 - Airtight sandbox for unsafe js code.
 - Kills unresponsive scripts after 10 seconds (Prevents `while(true) {}` lock up).
@@ -22,15 +22,11 @@ DuktapeVM().then((vm) => {
 
     vm.evalAsync(` 
         setTimeout(function() {
-            _success("hello, " + args[0]);
+            _success("hello, world!");
         }, 1000);`, 
-        ["world!"]
     ).then((res) => {
         console.log(res) // hello, world!
     })
-
-    // destroy vm
-    vm.destroy();
 });
 ```
 
@@ -58,13 +54,13 @@ The library will attach `DuktapeVM` to window/global, allowing you to access it 
 
 ```html
 <!-- Webassembly Only Version (Fast with 75% browser support), 110KB -->
-<script src="https://cdn.jsdelivr.net/npm/duktape-vm@0.1.3/build/duktape-vm.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/duktape-vm@0.1.4/build/duktape-vm.min.js"></script>
 
 <!-- AsmJS Only Version (Slower with 95% browser support), 115KB -->
-<script src="https://cdn.jsdelivr.net/npm/duktape-vm@0.1.3/build/duktape-vm.min.asm.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/duktape-vm@0.1.4/build/duktape-vm.min.asm.js"></script>
 
 <!-- Webassembly with AsmJS fallback (Fast with 95% browser support), 220KB -->
-<script src="https://cdn.jsdelivr.net/npm/duktape-vm@0.1.3/build/duktape-vm.min.both.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/duktape-vm@0.1.4/build/duktape-vm.min.both.js"></script>
 ```
 
 ## Virtual Machine Available Globals
@@ -140,6 +136,10 @@ DuktapeVM(`
     `, ["hello world!"]).then((result) => {
         console.log(result) // "hello world!"
     });
+
+    // reload vm
+    // dumps the stack, makes a new one, then runs the init code again
+    vm.reset();
 
     // destroy vm
     vm.destroy();
